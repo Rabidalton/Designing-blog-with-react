@@ -39,6 +39,25 @@ app.put('/api/articles/:name/upvote', async (req, res) => {
     }
 });
 
+/*Develop code for upvoting article
+To do this, we use the put request
+*/
+app.put('/api/articles/:name/downvote', async (req, res) => {
+    const { name } = req.params; //Find the name of the article    
+    await db.collection('articles').updateOne({ name }, { //Looks for the article collection and find the id.
+        $inc: {upvotes: -1}, //Increments the upvotes by 1.
+    }); 
+
+    //We need to load the article to see the number of upvotes.
+    const article = await db.collection('articles').findOne({ name });
+    if (article) { //validates the article's existence.        
+        res.send(`The ${name} article has ${article.upvotes} upvotes`); //Send by the response
+    } else {
+        res.send('That article doesn\'t exist'); //Send this response if there's an error.
+    }
+});
+
+
 /*Adding comments
 Almost the same code as upvote.
 */
