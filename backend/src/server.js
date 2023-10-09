@@ -51,7 +51,7 @@ app.put('/api/articles/:name/downvote', async (req, res) => {
     //We need to load the article to see the number of upvotes.
     const article = await db.collection('articles').findOne({ name });
     if (article) { //validates the article's existence.        
-        res.send(`The ${name} article has ${article.upvotes} upvotes`); //Send by the response
+        res.json(article); //Send by the response
     } else {
         res.send('That article doesn\'t exist'); //Send this response if there's an error.
     }
@@ -74,7 +74,7 @@ app.post('/api/articles/:name/comments', async (req, res) => {
 
     if (article) { //If the article exists,
         article.comments.push({ postedBy, text }); //Push the comment to the comments array.
-        res.send(article.comments);
+        res.json(article);
     } else {
         res.send('That article doesn\'t exist!'); //Throw this error if it doesn't exist.
     }
