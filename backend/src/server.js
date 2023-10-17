@@ -1,8 +1,14 @@
 //Import Express and all the dependencies
 import fs from 'fs';
+import path from 'path';
 import admin from 'firebase-admin';
 import express from 'express';
 import {db, connectToDb} from './db.js'
+import 'dotenv/config';
+
+import { fileURLToPath  } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 //Code for loading the credentials package using the node.js readFileSync.
 const credentials = JSON.parse(
@@ -21,6 +27,11 @@ admin.initializeApp({
 //Create the express App object or container for the app. 
 const app = express();
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../build')));
+
+app.get(/^(?!\/api).+/, (req, res) => {
+    res.sendFile(path.join(__dirname, '../build/index.html'));
+});
 
 
 //Code for express middleware
@@ -76,7 +87,7 @@ app.use((req, res, next) => {
     } else {
         res.sendStatus(401);
     } 
-});
+}); 
 
 
 /*Develop code for upvoting article
@@ -159,10 +170,12 @@ It takes two arguments: port number and a callback
 Before listening, let it connect to db.
 */
 
+const PORT = process.env.PORT || 8000;
+
 connectToDb(() => {
     console.log('Successfully connected to the database.')
-    app.listen(8000, () => {
-        console.log('Server is listening on port 8000');
+    app.listen(PORT, () => {
+        console.log('Server is listening on port ' + PORT);
     });    
 });
 
